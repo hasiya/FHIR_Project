@@ -3,6 +3,8 @@ import json
 from fhir.resources.patient import Patient
 from fhir.resources.encounter import Encounter
 from fhir.resources.condition import Condition
+from fhir.resources.claim import Claim
+from fhir.resources.explanationofbenefit import ExplanationOfBenefit
 
 dir_list = listdir("./data")
 resource_type = set()
@@ -150,7 +152,7 @@ class EncounterResource:
     def __init__(self):
         self.id = None
         self.status = None
-        self.subject_id = None
+        self.patient_id = None
         self.encounter_class = None
         self.encounter_type = None
         self.primary_performer = None
@@ -167,7 +169,7 @@ class EncounterResource:
         self.status = encounter_resource.status
 
         subject_ref = encounter_resource.subject.reference
-        self.subject_id = subject_ref.split(":")[2]
+        self.patient_id = subject_ref.split(":")[2]
 
         self.encounter_class = encounter_class_dict[encounter_resource.class_fhir.code]
         self.encounter_type = encounter_resource.type[0].text
@@ -189,7 +191,7 @@ class EncounterResource:
     def __str__(self):
         return f"id: {self.id}\n" \
                f"status: {self.status}\n" \
-               f"subject ID: {self.subject_id}\n" \
+               f"subject ID: {self.patient_id}\n" \
                f"class: {self.encounter_class}\n" \
                f"type: {self.encounter_type}\n" \
                f"primary performer: {self.primary_performer}\n" \
@@ -209,9 +211,9 @@ class ConditionResource:
         self.verification_status = None
         self.category = None
         self.severity = None
-        self.code = None
+        self.diagnosis = None
         self.body_site = None
-        self.subject_id = None
+        self.patient_id = None
         self.encounter_id = None
         self.onset_datetime = None
         self.record_datetime = None
@@ -226,13 +228,13 @@ class ConditionResource:
         if condition_resource.severity is not None:
             self.severity = condition_resource.severity.coding[0].display
 
-        self.code = condition_resource.code.text
+        self.diagnosis = condition_resource.code.text
 
         if condition_resource.bodySite is not None:
             self.body_site = condition_resource
 
         subject_ref = condition_resource.subject.reference
-        self.subject_id = subject_ref.split(":")[2]
+        self.patient_id = subject_ref.split(":")[2]
 
         encounter_ref = condition_resource.encounter.reference
         self.encounter_id = encounter_ref.split(":")[2]
@@ -245,86 +247,63 @@ class ConditionResource:
         return self
 
 
-# def get_patient_obj(patient_resource):
-#     patient = PatientResource()
-#     patient.id = patient_resource.id
-#     patient_name_array = patient_resource.name
-#     for n in patient_name_array:
-#         if n.use == "official":
-#             if n.prefix is not None:
-#                 patient.prefix = ', '.join(n.prefix)
-#             patient.family_name = n.family
-#             patient.given_names = ' '.join(n.given)
-#         elif n.use == "maiden":
-#             patient.maiden_name = n.family
-#
-#     patient.dob = patient_resource.birthDate
-#     patient.gender = patient_resource.gender
-#
-#     patient_telecom_obj = patient_resource.telecom[0]
-#     patient.contact_number = patient_telecom_obj.value
-#
-#     patient_address_obj = patient_resource.address[0]
-#     patient.address_line = ', '.join(patient_address_obj.line)
-#     patient.address_city = patient_address_obj.city
-#     patient.address_district = patient_address_obj.district
-#     patient.address_state = patient_address_obj.state
-#     patient.address_postal_code = patient_address_obj.postalCode
-#     patient.address_country = patient_address_obj.country
-#
-#     patient_identifiers = patient_resource.identifier
-#     for i in patient_identifiers:
-#         if i.type is None:
-#             continue
-#         if i.type.text == "Medical Record Number":
-#             patient.medical_record_number = i.value
-#         elif i.type.text == "Social Security Number":
-#             patient.social_security_number = i.value
-#         elif i.type.text == "Driver's License":
-#             patient.drivers_licence = i.value
-#         elif i.type.text == "Passport Number":
-#             patient.passport_number = i.value
-#
-#     patient_marital_obj = patient_resource.maritalStatus
-#     if patient_marital_obj is not None:
-#         patient.marital_status = marital_status_dict[patient_marital_obj.coding[0].code]
-#
-#     return patient
+class ExplanationOfBenefitResource:
+    def __init__(self):
+        self.id = None
+        self.status = None
+        self.type = None
+        self.use = None
+        self.patient_id = None
+        self.billable_start_datetime = None
+        self.billable_end_datetime = None
+        self.created = None
+        self.insurance = None
+        self.facility = None
+        self.claim_id = None
+        self.outcome = None
+        self.encounter_id = None
+        self.total_amount = None
+        self.total_currency = None
+        self.payment_amount = None
+        self.payment_currency = None
 
+    def get_explanation_of_benefit_obj(self, explanation_of_benefit):
+        self.id = explanation_of_benefit.id
+        self.status = explanation_of_benefit.status
+        self.type = explanation_of_benefit.type.coding[0].code
+        self.use = explanation_of_benefit.use
 
-# def get_encounter_obj(encounter_resource):
-#     encounter = EncounterResource()
-#     encounter.id = encounter_resource.id
-#     encounter.status = encounter_resource.status
-#
-#     subject_ref = encounter_resource.subject.reference
-#     encounter.subject_id = subject_ref.split(":")[2]
-#
-#     encounter.encounter_class = encounter_class_dict[encounter_resource.class_fhir.code]
-#     encounter.encounter_type = encounter_resource.type[0].text
-#     encounter.primary_performer = encounter_resource.participant[0].individual.display
-#     encounter.start_datetime = encounter_resource.period.start
-#     encounter.end_datetime = encounter_resource.period.end
-#
-#     if encounter_resource.hospitalization is not None:
-#         encounter.discharge_disposition = encounter_resource.hospitalization.dischargeDisposition.text
-#
-#     encounter.location = encounter_resource.location[0].location.display
-#     encounter.service_provider = encounter_resource.serviceProvider.display
-#
-#     if encounter_resource.reasonCode is not None:
-#         encounter.reason = encounter_resource.reasonCode[0].coding[0].display
-#
-#     return encounter
+        patient_ref = explanation_of_benefit.patient.reference
+        self.patient_id = patient_ref.split(":")[2]
+
+        self.billable_start_datetime = explanation_of_benefit.billablePeriod.start
+        self.billable_end_datetime = explanation_of_benefit.billablePeriod.end
+        self.created = explanation_of_benefit.created
+        self.insurance = explanation_of_benefit.insurance[0].coverage.display
+        self.facility = explanation_of_benefit.facility.display
+
+        claim_ref = explanation_of_benefit.claim.reference
+        self.claim_id = claim_ref.split(":")[2]
+
+        self.outcome = explanation_of_benefit.outcome
+
+        encounter_ref = explanation_of_benefit.item[0].encounter[0].reference
+        self.encounter_id = encounter_ref.split(":")[2]
+
+        self.total_amount = explanation_of_benefit.total[0].amount.value
+        self.total_currency = explanation_of_benefit.total[0].amount.currency
+        self.payment_amount = explanation_of_benefit.payment.amount.value
+        self.payment_currency = explanation_of_benefit.payment.amount.currency
+
+        return self
 
 
 def read_json(f_name):
     global entry
     # print(f_name)
 
-    with open(f_name, 'r') as F:
-        person = {}
-        data = json.loads(F.read())
+    with open(f_name, 'r') as fhir_file:
+        data = json.loads(fhir_file.read())
         for i in data["entry"]:
             res_type = i["resource"]["resourceType"]
             res = i["resource"]
@@ -364,15 +343,32 @@ def read_json(f_name):
                 condition = Condition.parse_obj(res)
                 cr = ConditionResource()
                 condition_obj = cr.get_condition_obj(condition)
+                # print(condition_obj)
                 # print(condition.clinicalStatus.coding[0].code)
                 # if len(condition.category) > 0:
-                if condition.bodySite is not None:
-                    entry += 1
+                # if condition.bodySite is not None:
+                #     entry += 1
+
+            elif res_type == "Claim":
+                claim = Claim.parse_obj(res)
+                # if claim.insurance[0].coverage.display == 'NO_INSURANCE':
+                #     entry += 1
+                # else:
+                # print(claim.insurance[0].coverage.display)
+
+            elif res_type == "ExplanationOfBenefit":
+                explanation_of_benefit = ExplanationOfBenefit.parse_obj(res)
+                eob_r = ExplanationOfBenefitResource()
+                eob_obj = eob_r.get_explanation_of_benefit_obj(explanation_of_benefit)
+                print(eob_obj)
+                # print(explanation_of_benefit.insurer.display)
+                # if explanation_of_benefit.item[0].encounter[0].reference is not None:
+                # if len(explanation_of_benefit.type.coding) > 0:
+                #     entry += 1
 
             resource_type.add(i["resource"]["resourceType"])
 
 
-# print(dir_list)
 for f in dir_list:
     path = "./data/" + f
     read_json(path)
