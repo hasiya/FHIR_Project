@@ -6,6 +6,6 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY . /code/
-CMD ["python", "manage.py", "makemigrations"]
-CMD ["python", "manage.py", "migrate"]
+#CMD ["python", "manage.py", "makemigrations"]
+#CMD ["python", "manage.py", "migrate"]
 #RUN python populate_db.py
