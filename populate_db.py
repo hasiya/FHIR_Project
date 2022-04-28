@@ -3,8 +3,10 @@ import os
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FHIR_Project.settings')
 import django
+from django.contrib.auth import get_user_model
 
 django.setup()
+from django.contrib.auth.models import Permission
 from fhir_db.models import *
 
 from fhir.resources.patient import Patient as ResourcePatient
@@ -390,6 +392,23 @@ if Patient.objects.all().count() > 1:
     Encounter.objects.all().delete()
     Condition.objects.all().delete()
     ExplanationOfBenefit.objects.all().delete()
+
+User = get_user_model()
+if not User.objects.filter(username='user').exists():
+    user = User.objects.create_user(username='user', password='pwd')
+    user.is_superuser = False
+    user.is_staff = True
+    user.save()
+
+    permission_explanationofbenefit = Permission.objects.get(codename="view_explanationofbenefit")
+    permission_patient = Permission.objects.get(codename="view_patient")
+    permission_encounter = Permission.objects.get(codename="view_encounter")
+    permission_condition = Permission.objects.get(codename="view_condition")
+
+    user.user_permissions.add(permission_explanationofbenefit)
+    user.user_permissions.add(permission_patient)
+    user.user_permissions.add(permission_encounter)
+    user.user_permissions.add(permission_condition)
 
 for f in dir_list:
     path = data_path + f
