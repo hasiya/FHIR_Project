@@ -1,8 +1,24 @@
 services:
   web:
     build: .
-    command: python manage.py runsever 0.0.0.0.8000
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-      ports:
-        - "8000:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@admin.com
+      - DJANGO_SUPERUSER_PASSWORD=mypass
+    depends_on:
+      - migrate
+  populate:
+    build: .
+    command: python populate_db.py
+    depends_on:
+      - web
+  migrate:
+    build: .
+    command: >
+      sh -c "python manage.py makemigrations &&
+      python manage.py migrate"
