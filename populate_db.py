@@ -276,6 +276,11 @@ class ExplanationOfBenefitResource:
 
 
 def read_json(f_name):
+    patient_django = None
+    encounter_django = None
+    condition_django = None
+    eob_django = None
+
     with open(f_name, 'r') as fhir_file:
         data = json.loads(fhir_file.read())
         for i in data["entry"]:
@@ -308,26 +313,157 @@ def read_json(f_name):
                     drivers_licence=patient_obj.drivers_licence,
                     passport_number=patient_obj.passport_number
                 )
-                print(patient_obj)
+                patient_django.save()
+                # print(patient_obj)
 
             elif res_type == "Encounter":
                 encounter = ResourceEncounter.parse_obj(res)
                 er = EncounterResource()
                 encounter_obj = er.get_encounter_obj(encounter)
+                encounter_django = Encounter(
+                    id=encounter_obj.id,
+                    patient=patient_django,
+                    status=encounter_obj.status,
+                    encounter_class=encounter_obj.encounter_class,
+                    encounter_type=encounter_obj.encounter_type,
+                    primary_performer=encounter_obj.primary_performer,
+                    start_datetime=encounter_obj.start_datetime,
+                    end_datetime=encounter_obj.end_datetime,
+                    discharge_disposition=encounter_obj.discharge_disposition,
+                    location=encounter_obj.location,
+                    service_provider=encounter_obj.service_provider,
+                    reason=encounter_obj.reason
+                )
+                encounter_django.save()
+
+                # encounter_django = patient_django.encounter_set.create(
+                #     id=encounter_obj.id,
+                #     status=encounter_obj.status,
+                #     encounter_class=encounter_obj.encounter_class,
+                #     encounter_type=encounter_obj.encounter_type,
+                #     primary_performer=encounter_obj.primary_performer,
+                #     start_datetime=encounter_obj.start_datetime,
+                #     end_datetime=encounter_obj.end_datetime,
+                #     discharge_disposition=encounter_obj.discharge_disposition,
+                #     location=encounter_obj.location,
+                #     service_provider=encounter_obj.service_provider,
+                #     reason=encounter_obj.reason
+                # )
+                # print(encounter_django)
 
             elif res_type == "Condition":
                 condition = ResourceCondition.parse_obj(res)
                 cr = ConditionResource()
                 condition_obj = cr.get_condition_obj(condition)
+                condition_django = Condition(
+                    id=condition_obj.id,
+                    patient=patient_django,
+                    encounter=encounter_django,
+                    clinical_status=condition_obj.clinical_status,
+                    severity=condition_obj.severity,
+                    diagnosis=condition_obj.diagnosis,
+                    body_site=condition_obj.body_site,
+                    onset_datetime=condition_obj.onset_datetime,
+                    record_datetime=condition_obj.record_datetime,
+                    abatement_datetime=condition_obj.abatement_datetime
+                )
+                condition_django.save()
+
+                # condition_django = encounter_django.condition_set.create(
+                #     id=condition_obj.id,
+                #     clinical_status=condition_obj.clinical_status,
+                #     severity=condition_obj.severity,
+                #     diagnosis=condition_obj.diagnosis,
+                #     body_site=condition_obj.body_site,
+                #     onset_datetime=condition_obj.onset_datetime,
+                #     record_datetime=condition_obj.record_datetime,
+                #     abatement_datetime=condition_obj.abatement_datetime
+                # )
+                #
+                # condition_django = patient_django.condition_set.create(
+                #     id=condition_obj.id,
+                #     clinical_status=condition_obj.clinical_status,
+                #     severity=condition_obj.severity,
+                #     diagnosis=condition_obj.diagnosis,
+                #     body_site=condition_obj.body_site,
+                #     onset_datetime=condition_obj.onset_datetime,
+                #     record_datetime=condition_obj.record_datetime,
+                #     abatement_datetime=condition_obj.abatement_datetime
+                # )
 
             elif res_type == "ExplanationOfBenefit":
                 explanation_of_benefit = ResourceEOB.parse_obj(res)
                 eob_r = ExplanationOfBenefitResource()
                 eob_obj = eob_r.get_explanation_of_benefit_obj(explanation_of_benefit)
+                eob_django = ExplanationOfBenefit(
+                    id=eob_obj.id,
+                    patient=patient_django,
+                    encounter=encounter_django,
+                    status=eob_obj.status,
+                    type=eob_obj.type,
+                    use=eob_obj.use,
+                    billable_start_datetime=eob_obj.billable_start_datetime,
+                    billable_end_datetime=eob_obj.billable_end_datetime,
+                    created=eob_obj.created,
+                    insurance=eob_obj.insurance,
+                    facility=eob_obj.facility,
+                    claim_id=eob_obj.claim_id,
+                    outcome=eob_obj.outcome,
+                    total_amount=eob_obj.total_amount,
+                    total_currency=eob_obj.total_currency,
+                    payment_amount=eob_obj.payment_amount,
+                    payment_currency=eob_obj.payment_currency
+                )
+                # print(eob_obj.total_amount)
+                # print(eob_obj.payment_amount)
+                eob_django.save()
+
+                # eob_django = patient_django.explanationofbenefit_set.create(
+                #     id=eob_obj.id,
+                #     status=eob_obj.status,
+                #     type=eob_obj.type,
+                #     use=eob_obj.use,
+                #     billable_start_datetime=eob_obj.billable_start_datetime,
+                #     billable_end_datetime=eob_obj.billable_end_datetime,
+                #     created=eob_obj.created,
+                #     insurance=eob_obj.insurance,
+                #     facility=eob_obj.facility,
+                #     claim_id=eob_obj.claim_id,
+                #     outcome=eob_obj.outcome,
+                #     total_amount=eob_obj.total_amount,
+                #     total_currency=eob_obj.total_currency,
+                #     payment_amount=eob_obj.payment_amount,
+                #     payment_currency=eob_obj.payment_currency
+                # )
+                # eob_django = encounter_django.explanationofbenefit_set.create(
+                #     id=eob_obj.id,
+                #     status=eob_obj.status,
+                #     type=eob_obj.type,
+                #     use=eob_obj.use,
+                #     billable_start_datetime=eob_obj.billable_start_datetime,
+                #     billable_end_datetime=eob_obj.billable_end_datetime,
+                #     created=eob_obj.created,
+                #     insurance=eob_obj.insurance,
+                #     facility=eob_obj.facility,
+                #     claim_id=eob_obj.claim_id,
+                #     outcome=eob_obj.outcome,
+                #     total_amount=eob_obj.total_amount,
+                #     total_currency=eob_obj.total_currency,
+                #     payment_amount=eob_obj.payment_amount,
+                #     payment_currency=eob_obj.payment_currency
+                # )
 
 
 data_path = 'EMIS_FHIR_extract_data/data/'
 dir_list = os.listdir(data_path)
+
+if Patient.objects.all().count() > 1:
+    Patient.objects.all().delete()
+    Encounter.objects.all().delete()
+    Condition.objects.all().delete()
+    ExplanationOfBenefit.objects.all().delete()
+
 for f in dir_list:
     path = data_path + f
     read_json(path)
+    print(path + " --- added to the Database")
