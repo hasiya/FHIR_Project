@@ -387,11 +387,11 @@ def read_json(f_name):
 data_path = 'EMIS_FHIR_extract_data/data/'
 dir_list = os.listdir(data_path)
 
-if Patient.objects.all().count() > 1:
-    Patient.objects.all().delete()
-    Encounter.objects.all().delete()
-    Condition.objects.all().delete()
-    ExplanationOfBenefit.objects.all().delete()
+# if Patient.objects.all().count() > 1:
+#     Patient.objects.all().delete()
+#     Encounter.objects.all().delete()
+#     Condition.objects.all().delete()
+#     ExplanationOfBenefit.objects.all().delete()
 
 User = get_user_model()
 if not User.objects.filter(username='user').exists():
@@ -410,7 +410,8 @@ if not User.objects.filter(username='user').exists():
     user.user_permissions.add(permission_encounter)
     user.user_permissions.add(permission_condition)
 
-for f in dir_list:
-    path = data_path + f
-    read_json(path)
-    print(path + " --- added to the Database")
+if Patient.objects.all().count() == 0:
+    for f in dir_list:
+        path = data_path + f
+        read_json(path)
+        print(path + " --- added to the Database")

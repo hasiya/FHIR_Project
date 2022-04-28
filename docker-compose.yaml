@@ -6,8 +6,8 @@ services:
       - .:/code
     ports:
       - "8000:8000"
-    depends_on:
-      - migrate
+  #      depends_on:
+  #        - migrate
 
   #    environment:
   #      - DJANGO_SUPERUSER_USERNAME=admin
@@ -15,16 +15,16 @@ services:
   #      - DJANGO_SUPERUSER_PASSWORD=mypass
   #    depends_on:
   #      - populate
-  #  populate:
-  #    build: .
-  #    command: python populate_db.py
-  #    depends_on:
-  #      - migrate
-  migrate:
+  populate:
     build: .
-    command: python manage.py migrate
+    command: python populate_db.py
     depends_on:
-      - make-migrations
-  make-migrations:
-    build: .
-    command: python manage.py makemigrations
+      - web
+#  migrate:
+#    build: .
+#    command: python manage.py migrate
+#    depends_on:
+#      - make-migrations
+#  make-migrations:
+#    build: .
+#    command: python manage.py makemigrations
