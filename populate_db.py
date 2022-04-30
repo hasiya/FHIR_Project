@@ -280,8 +280,6 @@ class ExplanationOfBenefitResource:
 def read_json(f_name):
     patient_django = None
     encounter_django = None
-    condition_django = None
-    eob_django = None
 
     with open(f_name, 'r') as fhir_file:
         data = json.loads(fhir_file.read())
@@ -316,7 +314,6 @@ def read_json(f_name):
                     passport_number=patient_obj.passport_number
                 )
                 patient_django.save()
-                # print(patient_obj)
 
             elif res_type == "Encounter":
                 encounter = ResourceEncounter.parse_obj(res)
@@ -379,8 +376,6 @@ def read_json(f_name):
                     payment_amount=eob_obj.payment_amount,
                     payment_currency=eob_obj.payment_currency
                 )
-                # print(eob_obj.total_amount)
-                # print(eob_obj.payment_amount)
                 eob_django.save()
 
 
@@ -415,3 +410,5 @@ if Patient.objects.all().count() == 0:
         path = data_path + f
         read_json(path)
         print(path + " --- added to the Database")
+else:
+    print("The Database already contains data...")
