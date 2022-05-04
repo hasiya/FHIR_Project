@@ -1,16 +1,8 @@
 # FHIR Project
 
-This is project is developed as part of [EMIS Group](https://www.emishealth.com/) interview process.
-
-To Run The Dockerized Django project clone or download the git repository and run following docker command.
-
-    docker-compose up
-
-Once the docker image is up go to [0.0.0.0:8000/admin](https://0.0.0.0:8000/admin). Then use the following login details
-to log in.
-
-    Username - user
-    Passowrd - pwd
+This project is developed as part of a technical assignment for a company that supplies software in various areas of
+Healthcare. I was given some [FHIR](https://www.hl7.org/fhir/overview.html) data and the task was to transform these
+FHIR messages into a more workable format preferably in a tabular format.
 
 The Git repo File structure
 
@@ -25,30 +17,62 @@ The Git repo File structure
 ├── docker-compose.yaml --------- The Docker Compose yaml file.
 ├── fhir_db/ -------------------- The folder contains Django app file
 ├── manage.py ------------------- The manage.py file to run different Django commands
-├── populate_db.py -------------- The python file populates the SQLite database with example FHIR json files in the 'EMIS_FHIR_extract_data/data/' folder
+├── populate_db.py -------------- The python file populates the SQLite database with example FHIR json files in the '
+EMIS_FHIR_extract_data/data/' folder
 └── requirements.txt ------------ The requirement file install python packages 
 ```
-
----
-***The following of this README file will be updated with relevant documentation.***
 
 Trello Link - https://trello.com/b/tfM1FR7D
 
 ## Key Decisions Made
 
-    why python
-    Django
-    Library or reading json from scratch (fhir.resource Library)
-    what FHIR recources are processing 
+### Python
 
-## Problems I encountered
+The position I was applying was a Python developer, I decide it was appropriate to develop the solution in Python.
 
-## Problems I have still to address
+### Django
 
-## Testing
+I used [Django](https://www.djangoproject.com/) web framework to develop the solution. Django is a high-level Python web
+framework that allows you to develop complex web applications quickly without worrying about things like database
+integration, user authentication, content administration etc. The reason for choosing Django to develop this solution
+was the time frame of the technical assignment, and I didn't want think about database connections and writing SQL
+queries as Django handles all that.
 
-## Todo
+### Database - SQLite
 
-- systems architecture
-- database design
+I am using a SQLite database to store the process FHIR data. The reason for choosing SQLite is that by default the
+Django configuration uses SQLite. As well as SQLite Django officially supports PostgreSQL, MariaDB, MySQL and Oracle.
 
+### Using a Library to handle FHIR data
+
+In the start of the project I had two options for processing FHIR data files. First option is to read JSON file manually
+and extract the data, the second option is to use a library to process FHIR JSON files and extract the FHIR data. I
+decided to use a Python library called [FHIR Resources](https://pypi.org/project/fhir.resources/). This library allowed
+me to create FHIR resource objects just by parsing the JSON string.
+
+Following is an example of creating a FHIR resource object from a JSON string.
+
+```
+from fhir.resources.organization import Organization
+
+json_str = '''{
+        "resourceType": "Organization",
+        "id": "f001",
+        "active": True,
+        "name": "Acme Corporation",
+        "address": [{"country": "Switzerland"}]     
+    }'''
+org = Organization.parse_raw(json_str)  ## Creates a Organization FHIR resource object.
+```
+
+## Run the dokcerized Django project and access the Django admin site
+
+To Run The Dockerized Django project clone or download the git repository and run following docker command.
+
+    docker-compose up
+
+Once the docker image is up go to [0.0.0.0:8000/admin](https://0.0.0.0:8000/admin) to access the Django admin site. Then
+use the following login details to log in.
+
+    Username - user
+    Passowrd - pwd
