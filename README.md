@@ -70,10 +70,10 @@ To Run The Dockerized Django project clone or download the git repository and ru
 
     docker-compose up
 
-Once the Docker image is up go to [0.0.0.0:8000](http://0.0.0.0:8000/). This page allows you to upload FHIR data files
-in JSON format and the process the data in to the database. You can go to the Django admin site
-([0.0.0.0:8000/admin](http://0.0.0.0:8000/admin)) to view the processed FHIR data. Use the following login details to
-access the Django Admin site.
+Once the Docker image is up go to <a href="http://0.0.0.0:8000/" target="_blank">http://0.0.0.0:8000</a>. This page
+allows you to upload FHIR data files in JSON format and the process the data in to the database. You can go to the
+Django admin site <a href="http://0.0.0.0:8000/admin" target="_blank">http://0.0.0.0:8000/admin </a> to view the
+processed FHIR data. Use the following login details to access the Django Admin site.
 
     Username - user
     Passowrd - pwd
