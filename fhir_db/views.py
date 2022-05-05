@@ -28,6 +28,7 @@ def index(request):
                 process_fhir.read_json(f)
                 processed_files.append(f.name)
                 print(f)
+            form = UploadFileForm()
 
             context = {
                 'form': form,

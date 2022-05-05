@@ -8,10 +8,10 @@
 </form>
 
 {% if processed_files %}
-    <ul>
+    <ol>
         {% for f in processed_files %}
             <li>{{ f }} --- Processed</li>
         {% endfor %}
-    </ul>
+    </ol>
     <p>Go to the <a href="{% url 'admin:index' %}">Admin Site</a> to view the data</p>
 {% endif %}
