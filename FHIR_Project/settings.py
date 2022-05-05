@@ -84,6 +84,18 @@ DATABASES = {
     }
 }
 
+# Configure PostgreSQL db connection
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'fhir_db',
+#         'USER': 'fhir_user',
+#         'PASSWORD': 'fhir',
+#         'HOST': 'db',
+#         'PORT': '5432'
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

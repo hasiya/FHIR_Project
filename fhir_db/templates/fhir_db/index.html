@@ -1,0 +1,17 @@
+<p>Go to the <a href="{% url 'admin:index' %}">Admin Site</a> to view processed FHIR data</p>
+
+<form method="post" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{ form }}
+    {#    <input id="files" name="files" type="file" accept=".json" multiple>#}
+    <input type="submit" value="process">
+</form>
+
+{% if processed_files %}
+    <ul>
+        {% for f in processed_files %}
+            <li>{{ f }} --- Processed</li>
+        {% endfor %}
+    </ul>
+    <p>Go to the <a href="{% url 'admin:index' %}">Admin Site</a> to view the data</p>
+{% endif %}

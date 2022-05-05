@@ -17,8 +17,7 @@ The Git repo File structure
 ├── docker-compose.yaml --------- The Docker Compose yaml file.
 ├── fhir_db/ -------------------- The folder contains Django app file
 ├── manage.py ------------------- The manage.py file to run different Django commands
-├── populate_db.py -------------- The python file populates the SQLite database with example FHIR json files in the '
-EMIS_FHIR_extract_data/data/' folder
+├── populate_db.py -------------- The python file populates the SQLite database with example FHIR json files in the 'EMIS_FHIR_extract_data/data/' folder
 └── requirements.txt ------------ The requirement file install python packages 
 ```
 
@@ -52,7 +51,7 @@ me to create FHIR resource objects just by parsing the JSON string.
 
 Following is an example of creating a FHIR resource object from a JSON string.
 
-```
+```python
 from fhir.resources.organization import Organization
 
 json_str = '''{
@@ -65,14 +64,16 @@ json_str = '''{
 org = Organization.parse_raw(json_str)  ## Creates a Organization FHIR resource object.
 ```
 
-## Run the dokcerized Django project and access the Django admin site
+## Run the dokcerized Django project and access the Django Admin site
 
 To Run The Dockerized Django project clone or download the git repository and run following docker command.
 
     docker-compose up
 
-Once the docker image is up go to [0.0.0.0:8000/admin](https://0.0.0.0:8000/admin) to access the Django admin site. Then
-use the following login details to log in.
+Once the Docker image is up go to [0.0.0.0:8000](https://0.0.0.0:8000/). This page allows you to upload FHIR data files
+in JSON format and the process the data in to the database. You can go to the Django admin site
+([0.0.0.0:8000/admin](https://0.0.0.0:8000/admin)) to view the processed FHIR data. Use the following login details to
+access the Django Admin site.
 
     Username - user
     Passowrd - pwd
