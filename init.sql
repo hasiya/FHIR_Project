@@ -1,0 +1,5 @@
+CREATE
+DATABASE fhir_db;
+-- CREATE USER fhir_user WITH ENCRYPTED PASSWORD 'fhir';
+GRANT ALL PRIVILEGES ON DATABASE
+fhir_db TO fhir_user;

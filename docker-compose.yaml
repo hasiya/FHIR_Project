@@ -1,4 +1,16 @@
 services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    #    environment:
+    #      - "POSTGRES_HOST_AUTH_METHOD=trust"
+    environment:
+      - POSTGRES_DB=fhir_db
+      - POSTGRES_USER=fhir_user
+      - POSTGRES_PASSWORD=fhir
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -6,25 +18,9 @@ services:
       - .:/code
     ports:
       - "8000:8000"
-  #    depends_on:
-  #      - migrate
-
-  #    environment:
-  #      - DJANGO_SUPERUSER_USERNAME=admin
-  #      - DJANGO_SUPERUSER_EMAIL=admin@admin.com
-  #      - DJANGO_SUPERUSER_PASSWORD=mypass
-  #    depends_on:
-  #      - populate
-#  populate:
-#    build: .
-#    command: python populate_db.py
-#    depends_on:
-#      - web
-#  migrate:
-#    build: .
-#    command: python manage.py migrate
-#    depends_on:
-#      - make-migrations
-#  make-migrations:
-#    build: .
-#    command: python manage.py makemigrations
+    #    environment:
+    #      - POSTGRES_DB=fhir_db
+    #      - POSTGRES_USER=fhir_user
+    #      - POSTGRES_PASSWORD=fhir
+    depends_on:
+      - db

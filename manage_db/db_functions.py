@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 
+sys.path.append('')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FHIR_Project.settings')
 import django
 from django.contrib.auth import get_user_model
@@ -292,123 +294,164 @@ def read_json(f_name):
 
                 pr = PatientResource()
                 patient_obj = pr.get_patient_obj(patient)
-                patient_django = Patient(
-                    id=patient_obj.id,
-                    prefix=patient_obj.prefix,
-                    given_names=patient_obj.given_names,
-                    family_name=patient_obj.family_name,
-                    maiden_name=patient_obj.maiden_name,
-                    birth_date=patient_obj.dob,
-                    gender=patient_obj.gender,
-                    marital_status=patient_obj.marital_status,
-                    contact_number=patient_obj.contact_number,
-                    address_line=patient_obj.address_line,
-                    address_city=patient_obj.address_city,
-                    address_district=patient_obj.address_district,
-                    address_state=patient_obj.address_state,
-                    address_postal_code=patient_obj.address_postal_code,
-                    address_country=patient_obj.address_country,
-                    medical_record_number=patient_obj.medical_record_number,
-                    social_security_number=patient_obj.social_security_number,
-                    drivers_licence=patient_obj.drivers_licence,
-                    passport_number=patient_obj.passport_number
-                )
-                patient_django.save()
+                # check if the patient exist before adding
+                if Patient.objects.filter(id=patient_obj.id).exists():
+                    patient_django = Patient.objects.get(id=patient_obj.id)
+                    print("patient Exists ")
+                else:
+                    patient_django = Patient(
+                        id=patient_obj.id,
+                        prefix=patient_obj.prefix,
+                        given_names=patient_obj.given_names,
+                        family_name=patient_obj.family_name,
+                        maiden_name=patient_obj.maiden_name,
+                        birth_date=patient_obj.dob,
+                        gender=patient_obj.gender,
+                        marital_status=patient_obj.marital_status,
+                        contact_number=patient_obj.contact_number,
+                        address_line=patient_obj.address_line,
+                        address_city=patient_obj.address_city,
+                        address_district=patient_obj.address_district,
+                        address_state=patient_obj.address_state,
+                        address_postal_code=patient_obj.address_postal_code,
+                        address_country=patient_obj.address_country,
+                        medical_record_number=patient_obj.medical_record_number,
+                        social_security_number=patient_obj.social_security_number,
+                        drivers_licence=patient_obj.drivers_licence,
+                        passport_number=patient_obj.passport_number
+                    )
+                    patient_django.save()
+                    print("Patient Saved")
 
             elif res_type == "Encounter":
                 encounter = ResourceEncounter.parse_obj(res)
                 er = EncounterResource()
                 encounter_obj = er.get_encounter_obj(encounter)
-                encounter_django = Encounter(
-                    id=encounter_obj.id,
-                    patient=patient_django,
-                    status=encounter_obj.status,
-                    encounter_class=encounter_obj.encounter_class,
-                    encounter_type=encounter_obj.encounter_type,
-                    primary_performer=encounter_obj.primary_performer,
-                    start_datetime=encounter_obj.start_datetime,
-                    end_datetime=encounter_obj.end_datetime,
-                    discharge_disposition=encounter_obj.discharge_disposition,
-                    location=encounter_obj.location,
-                    service_provider=encounter_obj.service_provider,
-                    reason=encounter_obj.reason
-                )
-                encounter_django.save()
+                if Encounter.objects.filter(id=encounter_obj.id).exists():
+                    encounter_django = Encounter.objects.get(id=encounter_obj.id)
+                else:
+                    encounter_django = Encounter(
+                        id=encounter_obj.id,
+                        patient=patient_django,
+                        status=encounter_obj.status,
+                        encounter_class=encounter_obj.encounter_class,
+                        encounter_type=encounter_obj.encounter_type,
+                        primary_performer=encounter_obj.primary_performer,
+                        start_datetime=encounter_obj.start_datetime,
+                        end_datetime=encounter_obj.end_datetime,
+                        discharge_disposition=encounter_obj.discharge_disposition,
+                        location=encounter_obj.location,
+                        service_provider=encounter_obj.service_provider,
+                        reason=encounter_obj.reason
+                    )
+                    encounter_django.save()
 
             elif res_type == "Condition":
                 condition = ResourceCondition.parse_obj(res)
                 cr = ConditionResource()
                 condition_obj = cr.get_condition_obj(condition)
-                condition_django = Condition(
-                    id=condition_obj.id,
-                    patient=patient_django,
-                    encounter=encounter_django,
-                    clinical_status=condition_obj.clinical_status,
-                    severity=condition_obj.severity,
-                    diagnosis=condition_obj.diagnosis,
-                    body_site=condition_obj.body_site,
-                    onset_datetime=condition_obj.onset_datetime,
-                    record_datetime=condition_obj.record_datetime,
-                    abatement_datetime=condition_obj.abatement_datetime
-                )
-                condition_django.save()
+                if Condition.objects.filter(id=condition_obj.id).exists():
+                    condition_django = Condition.objects.get(id=condition_obj.id)
+                else:
+                    condition_django = Condition(
+                        id=condition_obj.id,
+                        patient=patient_django,
+                        encounter=encounter_django,
+                        clinical_status=condition_obj.clinical_status,
+                        severity=condition_obj.severity,
+                        diagnosis=condition_obj.diagnosis,
+                        body_site=condition_obj.body_site,
+                        onset_datetime=condition_obj.onset_datetime,
+                        record_datetime=condition_obj.record_datetime,
+                        abatement_datetime=condition_obj.abatement_datetime
+                    )
+                    condition_django.save()
 
             elif res_type == "ExplanationOfBenefit":
                 explanation_of_benefit = ResourceEOB.parse_obj(res)
                 eob_r = ExplanationOfBenefitResource()
                 eob_obj = eob_r.get_explanation_of_benefit_obj(explanation_of_benefit)
-                eob_django = ExplanationOfBenefit(
-                    id=eob_obj.id,
-                    patient=patient_django,
-                    encounter=encounter_django,
-                    status=eob_obj.status,
-                    type=eob_obj.type,
-                    use=eob_obj.use,
-                    billable_start_datetime=eob_obj.billable_start_datetime,
-                    billable_end_datetime=eob_obj.billable_end_datetime,
-                    created=eob_obj.created,
-                    insurance=eob_obj.insurance,
-                    facility=eob_obj.facility,
-                    claim_id=eob_obj.claim_id,
-                    outcome=eob_obj.outcome,
-                    total_amount=eob_obj.total_amount,
-                    total_currency=eob_obj.total_currency,
-                    payment_amount=eob_obj.payment_amount,
-                    payment_currency=eob_obj.payment_currency
-                )
-                eob_django.save()
+                if ExplanationOfBenefit.objects.filter(id=eob_obj.id):
+                    eob_django = ExplanationOfBenefit.objects.get(id=eob_obj.id)
+                else:
+                    eob_django = ExplanationOfBenefit(
+                        id=eob_obj.id,
+                        patient=patient_django,
+                        encounter=encounter_django,
+                        status=eob_obj.status,
+                        type=eob_obj.type,
+                        use=eob_obj.use,
+                        billable_start_datetime=eob_obj.billable_start_datetime,
+                        billable_end_datetime=eob_obj.billable_end_datetime,
+                        created=eob_obj.created,
+                        insurance=eob_obj.insurance,
+                        facility=eob_obj.facility,
+                        claim_id=eob_obj.claim_id,
+                        outcome=eob_obj.outcome,
+                        total_amount=eob_obj.total_amount,
+                        total_currency=eob_obj.total_currency,
+                        payment_amount=eob_obj.payment_amount,
+                        payment_currency=eob_obj.payment_currency
+                    )
+                    eob_django.save()
 
 
-data_path = 'EMIS_FHIR_extract_data/data/'
-dir_list = os.listdir(data_path)
+def empty_db():
+    if Patient.objects.all().count() > 1:
+        Patient.objects.all().delete()
+        print("Patient data deleted")
+    else:
+        print("Patient data is already empty")
 
-# if Patient.objects.all().count() > 1:
-#     Patient.objects.all().delete()
-#     Encounter.objects.all().delete()
-#     Condition.objects.all().delete()
-#     ExplanationOfBenefit.objects.all().delete()
+    if Encounter.objects.all().count() > 1:
+        Encounter.objects.all().delete()
+        print("Encounter data deleted")
+    else:
+        print("Encounter data is already empty")
 
-User = get_user_model()
-if not User.objects.filter(username='user').exists():
-    user = User.objects.create_user(username='user', password='pwd')
-    user.is_superuser = False
-    user.is_staff = True
-    user.save()
+    if Condition.objects.all().count() > 1:
+        Condition.objects.all().delete()
+        print("Condition data deleted")
+    else:
+        print("Encounter data is already empty")
 
-    permission_explanationofbenefit = Permission.objects.get(codename="view_explanationofbenefit")
-    permission_patient = Permission.objects.get(codename="view_patient")
-    permission_encounter = Permission.objects.get(codename="view_encounter")
-    permission_condition = Permission.objects.get(codename="view_condition")
+    if ExplanationOfBenefit.objects.all().count() > 1:
+        ExplanationOfBenefit.objects.all().delete()
+        print("Explanation Of Benefit data deleted")
+    else:
+        print("Explanation Of Benefit data is already empty")
 
-    user.user_permissions.add(permission_explanationofbenefit)
-    user.user_permissions.add(permission_patient)
-    user.user_permissions.add(permission_encounter)
-    user.user_permissions.add(permission_condition)
 
-if Patient.objects.all().count() == 0:
-    for f in dir_list:
-        path = data_path + f
-        read_json(path)
-        print(path + " --- added to the Database")
-else:
-    print("The Database already contains data...")
+def create_admin_user():
+    User = get_user_model()
+    if not User.objects.filter(username='user').exists():
+        user = User.objects.create_user(username='user', password='pwd')
+        user.is_superuser = False
+        user.is_staff = True
+        user.save()
+
+        permission_explanationofbenefit = Permission.objects.get(codename="view_explanationofbenefit")
+        permission_patient = Permission.objects.get(codename="view_patient")
+        permission_encounter = Permission.objects.get(codename="view_encounter")
+        permission_condition = Permission.objects.get(codename="view_condition")
+
+        user.user_permissions.add(permission_explanationofbenefit)
+        user.user_permissions.add(permission_patient)
+        user.user_permissions.add(permission_encounter)
+        user.user_permissions.add(permission_condition)
+
+        print("Admin user created with permission to view FHIR Data ")
+    else:
+        print("Admin user already exists")
+
+
+def populate_db():
+    data_path = './EMIS_FHIR_extract_data/data/'
+    dir_list = os.listdir(data_path)
+    if Patient.objects.all().count() == 0:
+        for f in dir_list:
+            path = data_path + f
+            read_json(path)
+            print(path + " --- added to the Database")
+    else:
+        print("The Database already contains data...")
