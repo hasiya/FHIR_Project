@@ -77,14 +77,6 @@ WSGI_APPLICATION = 'FHIR_Project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# Configure SQLite db connection
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 # Configure PostgreSQL db connection
 DATABASES = {
     'default': {
