@@ -3,14 +3,10 @@ services:
     image: postgres
     volumes:
       - /var/lib/postgresql/data
-    #      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
-    #    environment:
     environment:
       - POSTGRES_DB=fhir_db
       - POSTGRES_USER=fhir_user
       - POSTGRES_PASSWORD=fhir
-  #      - POSTGRES_HOST_AUTH_METHOD=trust
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000

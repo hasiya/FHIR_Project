@@ -285,6 +285,7 @@ def read_json(f_name):
 
     with open(f_name, 'r') as fhir_file:
         data = json.loads(fhir_file.read())
+        print(f_name + " --- Processing")
         for i in data["entry"]:
             res_type = i["resource"]["resourceType"]
             res = i["resource"]
@@ -297,7 +298,7 @@ def read_json(f_name):
                 # check if the patient exist before adding
                 if Patient.objects.filter(id=patient_obj.id).exists():
                     patient_django = Patient.objects.get(id=patient_obj.id)
-                    print("patient Exists ")
+                    print("\tpatient Exists")
                 else:
                     patient_django = Patient(
                         id=patient_obj.id,
@@ -321,7 +322,7 @@ def read_json(f_name):
                         passport_number=patient_obj.passport_number
                     )
                     patient_django.save()
-                    print("Patient Saved")
+                    print("\tPatient Saved")
 
             elif res_type == "Encounter":
                 encounter = ResourceEncounter.parse_obj(res)
@@ -329,6 +330,7 @@ def read_json(f_name):
                 encounter_obj = er.get_encounter_obj(encounter)
                 if Encounter.objects.filter(id=encounter_obj.id).exists():
                     encounter_django = Encounter.objects.get(id=encounter_obj.id)
+                    print("\tEncounter Exists")
                 else:
                     encounter_django = Encounter(
                         id=encounter_obj.id,
@@ -345,6 +347,7 @@ def read_json(f_name):
                         reason=encounter_obj.reason
                     )
                     encounter_django.save()
+                    print("\tEncounter Saved")
 
             elif res_type == "Condition":
                 condition = ResourceCondition.parse_obj(res)
@@ -352,6 +355,7 @@ def read_json(f_name):
                 condition_obj = cr.get_condition_obj(condition)
                 if Condition.objects.filter(id=condition_obj.id).exists():
                     condition_django = Condition.objects.get(id=condition_obj.id)
+                    print("Condition Exists")
                 else:
                     condition_django = Condition(
                         id=condition_obj.id,
@@ -366,6 +370,7 @@ def read_json(f_name):
                         abatement_datetime=condition_obj.abatement_datetime
                     )
                     condition_django.save()
+                    print("\tCondition Saved")
 
             elif res_type == "ExplanationOfBenefit":
                 explanation_of_benefit = ResourceEOB.parse_obj(res)
@@ -373,6 +378,7 @@ def read_json(f_name):
                 eob_obj = eob_r.get_explanation_of_benefit_obj(explanation_of_benefit)
                 if ExplanationOfBenefit.objects.filter(id=eob_obj.id):
                     eob_django = ExplanationOfBenefit.objects.get(id=eob_obj.id)
+                    print("Explanation Of Benefit Exists")
                 else:
                     eob_django = ExplanationOfBenefit(
                         id=eob_obj.id,
@@ -394,6 +400,7 @@ def read_json(f_name):
                         payment_currency=eob_obj.payment_currency
                     )
                     eob_django.save()
+                    print("\tExplanation Of Benefit Saved")
 
 
 def empty_db():
@@ -424,8 +431,10 @@ def empty_db():
 
 def create_admin_user():
     User = get_user_model()
-    if not User.objects.filter(username='user').exists():
-        user = User.objects.create_user(username='user', password='pwd')
+    username = "user"
+    password = "pwd"
+    if not User.objects.filter(username=username).exists():
+        user = User.objects.create_user(username=username, password=password)
         user.is_superuser = False
         user.is_staff = True
         user.save()
@@ -440,9 +449,13 @@ def create_admin_user():
         user.user_permissions.add(permission_encounter)
         user.user_permissions.add(permission_condition)
 
-        print("Admin user created with permission to view FHIR Data ")
+        print("Admin user created with permission to view FHIR Data")
+        print(f"\tUsername - {username}")
+        print(f"\tPassword - {password}")
     else:
         print("Admin user already exists")
+        print(f"\tUsername - {username}")
+        print(f"\tPassword - {password}")
 
 
 def populate_db():

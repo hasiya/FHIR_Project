@@ -4,21 +4,27 @@ This project is developed as part of a technical assignment for a company that s
 Healthcare. I was given some [FHIR](https://www.hl7.org/fhir/overview.html) data and the task was to transform these
 FHIR messages into a more workable format preferably in a tabular format.
 
-The Git repo File structure
+## The Git repo File structure
 
 ```markdown
-├── Dockerfile ------------------ The Docker file
-├── EMIS_FHIR_extract_data/ ----- The folder containing example data and the python file to read the FHIR files
-│ ├── data/ --------------------- Example FHIR json files
-│ └── get_resources.py ---------- The initial python script that I wrote to understand FHIR data
-├── FHIR_Project/ --------------- The folder contains Django project files.
-├── README.md ------------------- The Readme file
-├── db.sqlite3 ------------------ The SQLite database file
-├── docker-compose.yaml --------- The Docker Compose yaml file.
-├── fhir_db/ -------------------- The folder contains Django app file
-├── manage.py ------------------- The manage.py file to run different Django commands
-├── populate_db.py -------------- The python file populates the SQLite database with example FHIR json files in the 'EMIS_FHIR_extract_data/data/' folder
-└── requirements.txt ------------ The requirement file install python packages 
+.
+├── Dockerfile --------------------- The Docker file
+├── EMIS_FHIR_extract_data/ -------- The folder containing example data and the python file to read the FHIR files
+│ ├── data/ ------------------------ Example FHIR JSON files
+│ └── get_resources.py ------------- The initial python script that I wrote to understand FHIR data
+├── FHIR_Project/ ------------------ The folder contains Django project files
+├── README.md ---------------------- The Readme file
+├── docker-compose.yaml ------------ The Docker Compose yaml file with PostgreSQL database service
+├── fhir_db/ ----------------------- The folder contains Django app file
+├── manage.py ---------------------- The manage.py file to run different Django commands
+├── manage_db/ --------------------- The folder contains python scripts to manage Database
+│ ├── __init__.py---
+│ ├── create_admin_user.py --------- Python script to create a Django admin user
+│ ├── db_functions.py -------------- The python file that contains functions to process FHIR JSON files, create Django admin user and Delete data in the FHIR database
+│ ├── empty_db .py ----------------- Python script to delete data in the FHIR database
+│ └── populate_db.py --------------- Python script to populate the FHIR database from Example FHIR JSON files
+├── migrate_and_create_user.sh ----- The bash script to run Django 'migrate' command and create the Django admin user
+└── requirements.txt --------------- The requirement file install python packages
 ```
 
 Trello Link - https://trello.com/b/tfM1FR7D
@@ -37,10 +43,13 @@ integration, user authentication, content administration etc. The reason for cho
 was the time frame of the technical assignment, and I didn't want think about database connections and writing SQL
 queries as Django handles all that.
 
-### Database - SQLite
+### Database - PostgreSQL
 
-I am using a SQLite database to store the process FHIR data. The reason for choosing SQLite is that by default the
-Django configuration uses SQLite. As well as SQLite Django officially supports PostgreSQL, MariaDB, MySQL and Oracle.
+I am using a PostgreSQL database to store the process FHIR data. initially I was using a SQLite database to store the
+FHIR
+data as SQLite is the default database for Django projects. However, later I decided to change the database to
+PostgreSQL, so I could get some experience on Django database configuration on PostgreSQL. As well as SQLite and
+PostgreSQL Django officially supports MariaDB, MySQL and Oracle.
 
 ### Using a Library to handle FHIR data
 
@@ -70,10 +79,18 @@ To Run The Dockerized Django project clone or download the git repository and ru
 
     docker-compose up
 
-Once the Docker image is up go to [http://0.0.0.0:8000](http://0.0.0.0:8000/). This page allows you to upload FHIR data files
-in JSON format and the process the data in to the database. You can go to the Django admin site
-([http://0.0.0.0:8000/admin](http://0.0.0.0:8000/admin)) to view the processed FHIR data. Use the following login details to
-access the Django Admin site.
+Once the Docker image is up and Django server is running, you have to run the Django 'migrate' command to create
+relevant Django database tables and create a Django admin user to access the Django Admin site. To do all this I have
+created a bash script which will run the appropriate commands in the Docker container. Run the following command in a
+separate terminal (if the Django server is running).
+
+    ./migrate_and_create_user.sh    
+
+Once the Docker image is up, the database migration is done and the Django Admin site user is created, go to
+[http://0.0.0.0:8000](http://0.0.0.0:8000/). This page allows you to upload FHIR data files in JSON format and the
+process the data in to the database. You can go to the Django Admin site
+([http://0.0.0.0:8000/admin](http://0.0.0.0:8000/admin)) to view the processed FHIR data. Use the following login
+details to access the Django Admin site.
 
     Username - user
     Passowrd - pwd
