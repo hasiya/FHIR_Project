@@ -4,6 +4,9 @@ This project is developed as part of a technical assignment for a company that s
 Healthcare. I was given some [FHIR](https://www.hl7.org/fhir/overview.html) data and the task was to transform these
 FHIR messages into a more workable format preferably in a tabular format.
 
+Note: This project was initially developed with a SQLite database. You can access that
+in [sqlite branch](https://github.com/hasiya/FHIR_Project/tree/sqlite).
+
 ## The Git repo File structure
 
 ```markdown
